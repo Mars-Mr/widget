@@ -1,24 +1,20 @@
-package com.qzn.myapplication4
+package com.custom.view.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Rect
-import android.graphics.RectF
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.method.LinkMovementMethod
-import android.text.style.CharacterStyle
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
-import com.example.myapplication.R
+import com.custom.view.R
 
 /**
  *

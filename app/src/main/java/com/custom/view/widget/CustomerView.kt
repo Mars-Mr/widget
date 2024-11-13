@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.custom.view.widget
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -11,6 +11,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
+import com.custom.view.R
 import kotlin.math.min
 
 

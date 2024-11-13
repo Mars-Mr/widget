@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.custom.view.widget
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -12,10 +12,11 @@ import android.graphics.Shader
 import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
+import com.custom.view.R
 import kotlin.math.min
 
 
-class CircleImage(context: Context,attrs: AttributeSet) : AppCompatImageView(context,attrs) {
+class CircleImage(context: Context, attrs: AttributeSet) : AppCompatImageView(context, attrs) {
 
     lateinit var mBitmap: Bitmap
     var mPaint: Paint
@@ -56,7 +57,7 @@ class CircleImage(context: Context,attrs: AttributeSet) : AppCompatImageView(con
         val scaleX = (width / mBitmap.width.toFloat())
         val scaleY = (height / mBitmap.height.toFloat())
         val matrix = Matrix()
-        matrix.setScale(scaleX,scaleY)
+        matrix.setScale(scaleX, scaleY)
         val bitmapShader = BitmapShader(mBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
         bitmapShader.setLocalMatrix(matrix)
         mPaint.shader = bitmapShader
@@ -68,14 +69,14 @@ class CircleImage(context: Context,attrs: AttributeSet) : AppCompatImageView(con
 
     private fun drawBorder(canvas: Canvas) {
         mPaint.reset()
-        mPaint.isAntiAlias=true
-        mPaint.color=Color.RED
-        mPaint.style=Paint.Style.STROKE
-        mPaint.strokeWidth=20f
+        mPaint.isAntiAlias = true
+        mPaint.color = Color.RED
+        mPaint.style = Paint.Style.STROKE
+        mPaint.strokeWidth = 20f
         val x = width / 2f
         val y = height / 2f
         val radius = min(x, y)
-        canvas.drawCircle(x, y, radius-10f, mPaint)
+        canvas.drawCircle(x, y, radius - 10f, mPaint)
     }
 
 }
