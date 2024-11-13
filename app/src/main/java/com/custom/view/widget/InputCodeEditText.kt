@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
+import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.util.AttributeSet
 import android.util.Log
@@ -24,6 +25,7 @@ import kotlin.math.min
 class InputCodeEditText(context: Context, attrs: AttributeSet) : AppCompatEditText(context, attrs) {
     private var measureWidth = 0
     private var measureHeight = 0
+    private var maxLength = 0
     private var content: String = ""
     private var TAG: String = InputCodeEditText::class.java.name
     private var mPaint: Paint = Paint()
@@ -34,14 +36,26 @@ class InputCodeEditText(context: Context, attrs: AttributeSet) : AppCompatEditTe
         mPaint.style = Paint.Style.FILL
         mPaint.isAntiAlias = true
         mPaint.color = resources.getColor(R.color.purple_500, null)
-//        scope.launch {
-//            while (true) {
-//                // 这里写你需要定时执行的任务
-//                println("Timer task executed.")
-//                delay(400) // 延迟1000毫秒
-//                invalidate()
-//            }
-//        }
+        maxLength = getMaxLengthFromAttrs()
+        println("Maximum Length Set: $maxLength")
+    }
+
+    // 获取 XML 中设置的 maxLength 属性值
+    private fun getMaxLengthFromAttrs(): Int {
+        // 获取 maxLength 属性值
+        val maxLength = getMaxLengthFilter()
+        return maxLength
+    }
+
+    // 从 InputFilter 中提取 maxLength 的值
+    private fun getMaxLengthFilter(): Int {
+        val filters = filters
+        for (filter in filters) {
+            if (filter is InputFilter.LengthFilter) {
+                return filter.max
+            }
+        }
+        return Int.MAX_VALUE  // 如果没有设置 maxLength，则返回一个极大的值
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -121,7 +135,7 @@ class InputCodeEditText(context: Context, attrs: AttributeSet) : AppCompatEditTe
         }
 //        val rect = RectF(lastCursorIndex, 0f, lastCursorIndex + 10f, 190f)
 //        canvas.drawRoundRect(rect, 20f, 20f, mPaint)
-        if (text!!.length >= 4) {
+        if (text!!.length >= maxLength) {
             return
         }
         if (bulibuli) {
