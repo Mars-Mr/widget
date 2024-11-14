@@ -1,30 +1,41 @@
-package com.custom.view.widget
+package com.qzn.common.widght
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.PorterDuff
+import android.graphics.Rect
 import android.graphics.RectF
-import android.graphics.drawable.Drawable
 import android.text.InputFilter
-import android.text.InputFilter.LengthFilter
 import android.util.AttributeSet
 import android.util.Log
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatEditText
 import com.custom.view.R
+import com.custom.view.utils.dp2px
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.min
 
-
-@SuppressLint("SoonBlockedPrivateApi")
+/**
+ *
+ * @ProjectName: My Application4
+ * @Package: com.qzn.myapplication4
+ * @ClassName: FlexibleTextView
+ * @Description: 描述
+ * @Author: 张洪
+ * @CreateDate: 2024/11/4 17:58
+ * @UpdateUser: 更新者
+ * @UpdateDate: 2024/11/4 17:58
+ * @UpdateRemark: 更新说明
+ * @Version: 1.0
+ */
 class InputCodeEditText(context: Context, attrs: AttributeSet) : AppCompatEditText(context, attrs) {
     private var measureWidth = 0
     private var measureHeight = 0
+    private var boxWidth = dp2px(40f)
+    private var boxHeight = dp2px(40f)
+    private var intervalOffest = dp2px(10f)
+    private var cursorIndexLeft = dp2px(10f).toFloat()
+    private var cursorPadding = dp2px(8f).toFloat()
     private var maxLength = 0
     private var content: String = ""
     private var TAG: String = InputCodeEditText::class.java.name
@@ -69,7 +80,6 @@ class InputCodeEditText(context: Context, attrs: AttributeSet) : AppCompatEditTe
         Log.e(TAG, "onMeasure h:${measureHeight} ")
         val width = calculateWidth(widthMode, measureWidth)
         val height = calculateHeight(heightMode, measureHeight)
-
         setMeasuredDimension(width, height)
     }
 
@@ -107,66 +117,87 @@ class InputCodeEditText(context: Context, attrs: AttributeSet) : AppCompatEditTe
     }
 
     private fun desiredWidth(): Int {
-        return 90000
+        return boxWidth * maxLength + intervalOffest * (maxLength - 1)
     }
 
     private fun desiredHeight(): Int {
-        return 120
+        return boxHeight
     }
 
-    var bulibuli: Boolean = false
+    var cursorFlag: Boolean = false
     override fun onDraw(canvas: Canvas) {
-//        super.onDraw(canvas)
-        var lastCursorIndex = 30f
         drawBackground(canvas)
-        mPaint.textSize = 90f
-        var index = 0f
-        mPaint.color = resources.getColor(R.color.black, null)
-        for (i in 0 until text!!.length) {
-            if (i == 0) {
-                index = 30f
-            } else {
-                index = i * 120f + 30f
-            }
-            canvas.drawText(text!![i].toString(), index, 90f, mPaint)
-        }
-        for (i in 0 until text!!.length) {
-            lastCursorIndex = (i + 1) * 120f + 30f
-        }
-//        val rect = RectF(lastCursorIndex, 0f, lastCursorIndex + 10f, 190f)
-//        canvas.drawRoundRect(rect, 20f, 20f, mPaint)
+        drawText(canvas)
         if (text!!.length >= maxLength) {
             return
         }
-        if (bulibuli) {
-            bulibuli = !bulibuli
+        drawCursor(canvas)
+    }
+
+    private fun drawText(canvas: Canvas) {
+        mPaint.textSize = dp2px(20f).toFloat()
+        mPaint.strokeWidth = dp2px(14f).toFloat()
+        var index = 0f
+        val bound = Rect()
+        mPaint.getTextBounds(text.toString(), 0, text!!.length, bound)
+
+        // 获取FontMetrics对象
+        val fontMetrics = mPaint.fontMetrics
+        val textHeight = mPaint.descent() - mPaint.ascent()
+        val y = boxHeight.toFloat() - (boxHeight.toFloat() - (textHeight / 2 - mPaint.descent()))
+        mPaint.color = resources.getColor(R.color.black, null)
+        for (i in 0 until text!!.length) {
+            if (i == 0) {
+                index = boxWidth / 3f
+            } else {
+                index = i * (boxWidth + intervalOffest) + (boxWidth / 3f)
+            }
+            canvas.drawText(text!![i].toString(), index, boxHeight.toFloat() * 2 / 3, mPaint)
+        }
+
+    }
+
+    private fun drawCursor(canvas: Canvas) {
+        for (i in 0 until text!!.length) {
+            cursorIndexLeft = (i + 1) * (boxWidth + intervalOffest) + boxWidth / 3f
+        }
+        if (text!!.isEmpty()) {
+            cursorIndexLeft = boxWidth / 3f
+        }
+        if (cursorFlag) {
+            cursorFlag = !cursorFlag
             mPaint.color = resources.getColor(R.color.white, null)
-            val rect = RectF(lastCursorIndex, 0f, lastCursorIndex + 10f, 190f)
+            val rect = RectF(
+                cursorIndexLeft,
+                cursorPadding / 2,
+                cursorIndexLeft + 10f,
+                boxHeight.toFloat() - cursorPadding / 2
+            )
             canvas.drawRoundRect(rect, 20f, 20f, mPaint)
         } else {
-            bulibuli = !bulibuli
+            cursorFlag = !cursorFlag
             mPaint.color = resources.getColor(R.color.black, null)
-            val rect = RectF(lastCursorIndex, 0f, lastCursorIndex + 10f, 190f)
+            val rect = RectF(
+                cursorIndexLeft,
+                cursorPadding / 2,
+                cursorIndexLeft + 10f,
+                boxHeight.toFloat() - cursorPadding / 2
+            )
             canvas.drawRoundRect(rect, 20f, 20f, mPaint)
         }
     }
 
 
     private fun drawBackground(canvas: Canvas) {
-        val top = 0
-        mPaint.color = resources.getColor(R.color.color_f00, null)
-        val rect1 = RectF(0f, 0f, 100f, 100f + top)
-        canvas.drawRoundRect(rect1, 20f, 20f, mPaint)
-
-        val rect2 = RectF(120f, 0f, 220f, 100f + top)
-        canvas.drawRoundRect(rect2, 20f, 20f, mPaint)
-
-        val rect3 = RectF(240f, 0f, 340f, 100f + top)
-        canvas.drawRoundRect(rect3, 20f, 20f, mPaint)
-
-        val rect4 = RectF(360f, 0f, 460f, 100f + top)
-        canvas.drawRoundRect(rect4, 20f, 20f, mPaint)
+        mPaint.color = resources.getColor(R.color.color_ffe6e6e6, null)
+        for (i in 0 until maxLength) {
+            val rect1 = RectF(
+                i * (boxWidth + intervalOffest).toFloat(),
+                0f,
+                boxWidth + i * (boxWidth + intervalOffest).toFloat(),
+                boxHeight.toFloat()
+            )
+            canvas.drawRoundRect(rect1, 10f, 10f, mPaint)
+        }
     }
-
-
 }
